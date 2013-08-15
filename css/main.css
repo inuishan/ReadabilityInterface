@@ -1,0 +1,29 @@
+html,body{
+	margin: 0px;
+	height: 100%;
+	width: 100%;
+}
+header{
+	width: 100%;
+	height: 100px;
+	background-color: #000000;
+	color: #ffffff;
+	text-align: center;
+	line-height: 100px;
+}
+#bar2{
+	width:100%;
+	height:28px;
+	background-color: #707070;
+	line-height: 30px;
+}
+#docSelect{
+	/*text-align: center;*/
+	margin-left: 5%;
+	line-height: 35px;
+
+
+}
+#docNo{
+	width:80px;
+}
