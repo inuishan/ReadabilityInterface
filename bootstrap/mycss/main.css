@@ -78,6 +78,10 @@ line-height: 25px;
   margin-left: 5px;
   padding-right: 5px;
 }
+#main_content{
+  margin:2% 10% 0% 10%;
+  text-align: center;
+}
 
 /*.styled-select-inner{
 display:inline:;

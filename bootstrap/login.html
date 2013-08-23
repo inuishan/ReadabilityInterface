@@ -47,9 +47,9 @@
               <li><a href="contact.html">Contact</a></li>
             </ul>
           </div><!--/.nav-collapse -->
-          <div class="btn-group" id="login" href="login.html">
+          <!-- <div class="btn-group" id="login" href="login.html">
           <a href="login.html"><button type="button" class="btn btn-inverse" href="login.html">Login</button></a>
-        </div>
+        </div> -->
         </div>
         
       </div>
@@ -65,11 +65,10 @@
 
             <form action="index.html" onsubmit="return validateLogin()">
 
-                <input id="uid"  value="userID" onBlur="if(this.value=='')this.value='userID'" onFocus="if(this.value=='userID')this.value='' "> <!-- JS because of IE support; better: placeholder="Email" -->
+                <input id="uid"  value="userID" class="enter_press" onBlur="if(this.value=='')this.value='userID'" onFocus="if(this.value=='userID')this.value='' "> <!-- JS because of IE support; better: placeholder="Email" -->
 
-                <input id="password" type="password"  value="Password" onBlur="if(this.value=='')this.value='Password'" onFocus="if(this.value=='Password')this.value='' "> <!-- JS because of IE support; better: placeholder="Password" -->
+                <input id="password" type="password"  class="enter_press" value="Password" onBlur="if(this.value=='')this.value='Password'" onFocus="if(this.value=='Password')this.value='' "> <!-- JS because of IE support; better: placeholder="Password" -->
 
-                <input type="submit" value="Login" id="login">
 
                 <footer class="clearfix">
 
@@ -77,6 +76,9 @@
                 </footer>
 
             </form>
+<!--                 <input type="button" value="Login" id="login">
+ -->
+    <button type="button" class="btn btn-inverse rate submitMiddle" width="100px" id="login">Login</button>
 
         </fieldset>
 
@@ -85,14 +87,37 @@
 
 
 
-
+<div id="logBox"></div>
 
 <script src="js/jquery.js"></script>
 
 
 <script type="text/javascript">
+
+function sendCredentials(){
+ // alert("fjkdf");
+   var pass = $("#password").val();
+   // $toret = true;
+  $.ajax({
+  type: 'GET',
+  url: "php/controller.php",
+  data:{method:"login",uid:$("#uid").val(),password:pass},
+  password:$("password").val(),
+  success: function(retdata){
+    // alert(toret);
+    if(retdata.status_code==200)
+      window.location.replace("index.html");
+    else alert("Wrong username and or password");
+      
+      // toret = false;
+    // alert(toret);
+  },
+  dataType: "json",
+  async:true
+  });
+}
 // alert("text");
-function validateLogin(){
+function validateLogin(){ 
    var pass = $("#password").val();
    $toret = true;
   $.ajax({
@@ -113,6 +138,33 @@ function validateLogin(){
 
   
 }
+$("#login").click(function(){
+  sendCredentials();
+
+
+});
+
+
+function log(msg){
+  if (window.console && console.log) {
+    // console.log(msg); //for firebug
+  }
+  // document.write(msg); //write to screen
+  $("#logBox").append(msg); //log to container
+  $("#logBox").append("<br>"); //log to container
+}
+
+
+
+$('.enter_press').keypress(function (e) {
+  if (e.which == 13) {
+    // $('form#login').submit();
+    e.preventDefault();
+    sendCredentials();
+    // alert("kds");
+  }
+});
+
 
 </script>
 

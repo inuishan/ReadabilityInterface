@@ -66,6 +66,9 @@
     <div class="styled-select-inner">
       <span class="rate">Select document</span>
       <select id="doc_ids">
+   </select> 
+   <span class="rate">Documents rated</span>
+      <select id="rated_ids">
    </select>
    <br>
    <span class="rate">Rate</span>
@@ -76,11 +79,11 @@
      <option>4</option>
      <option>5</option>
    </select> -->
-   <input type="radio" value="1" class="radio_button" name="1"><span class="radio_button">1</span>
-   <input type="radio" value="2" class="radio_button" name="1"><span class="radio_button">2</span>
-   <input type="radio" value="3" class="radio_button" name="1"><span class="radio_button">3</span>
-   <input type="radio" value="4" class="radio_button" name="1"><span class="radio_button">4</span>
-   <input type="radio" value="5" class="radio_button" name="1"><span class="radio_button">5</span>
+   <input type="radio" value="1" class="radio" id="1" checked="true" onclick="radioClick(this)"><span class="radio_button">1</span>
+   <input type="radio" value="2" class="radio" id="2" onclick="radioClick(this)"><span class="radio_button">2</span>
+   <input type="radio" value="3" class="radio" id="3" onclick="radioClick(this)"><span class="radio_button">3</span>
+   <input type="radio" value="4" class="radio" id="4" onclick="radioClick(this)"><span class="radio_button">4</span>
+   <input type="radio" value="5" class="radio" id="5" onclick="radioClick(this)"><span class="radio_button">5</span>
     </div>
     <div>
       <br>
@@ -103,6 +106,43 @@
 <!-- <script src="js/jquery.js"></script> -->
 <script type="text/javascript">
 
+
+
+
+
+
+function getRatedDocuments(){
+  $.get("php/controller.php",{method:'documentsRated'},function(retData){
+    if(retData.status_code==200){
+      // alert(retData.doc_ids);
+      var len = retData.doc_ids.length;
+      for(var i=0;i<len;i++){
+         $("#rated_ids").append('<option id="rateddocument'+i+'"'+'>'+retData.doc_ids[i]+'</option>');
+
+      }
+    }
+    else{
+      alert("Either you are not logged in or some error occured");
+    }
+  
+}
+,"json");
+
+}
+getRatedDocuments();
+
+
+function radioClick(event){
+  // alert(event);
+ $(".radio").each(function(index){
+    // log($(this).attr('checked'));
+      if(this.checked==true){
+        this.checked = false;
+      }
+ });
+ event.checked=true;
+
+}
 
 
 
@@ -171,6 +211,7 @@ $("#logout").click(function(){
         $("#user_name").html("Welcome guest");
         $("#login").css("display","inline");
         $("#logout").css("display","none");
+        window.location.reload(true);
 
     }
 }
@@ -242,6 +283,19 @@ function getSelectedText() {
 
 
           //new code
+          var crawler = 1;
+          for(;crawler<wordIndex;crawler++)
+            new_text = new_text + full_text_array[crawler-1] + " ";
+          new_text = new_text + "<span class=\"highlighted_text\">";
+          new_text = new_text + full_text_array[crawler-1];
+          crawler++;
+          for(;crawler<wordIndex+length_sel;crawler++)
+            new_text = new_text + " "+full_text_array[crawler-1];
+          new_text = new_text + "</span>";
+          // crawler++;
+          for(;crawler<=length;crawler++)
+            new_text= new_text+" "+full_text_array[crawler-1];
+
 
 
         //   for(var z=1;z<=length;z++){
@@ -312,6 +366,49 @@ $(document).keydown(function(evt){
 $("#highlight_button").attr('title', 'shortcut key is Ctrl+H');
 $("#highlight_button").click(function(){
 getSelectedText();
+});
+
+$("#submit_rating").click(function(){
+  var text = $("#doc_text").html();
+  var rating = 1;
+  $(".radio").each(function(index){
+    // log($(this).attr('checked'));
+      if(this.checked==true){
+        rating = index+1;
+      }
+ });
+
+  var doc_id = $("#doc_ids").val();
+  //submit rating
+  
+  $.post("php/controller.php",{method:'submitRating',text:text,doc_id:doc_id,rating:rating},function(retData){
+  if(retData.status_code==200)
+    {
+      alert("success");
+    }
+  else if(retData.status_code==400){
+    alert("Either you are not logged in or some error occured");
+  }
+  else if(retData.status_code==300){
+    alert("You have already submitted the rating for the doc");
+  }
+  else if(retData.status_code==302){
+    var r = confirm("You have already rated this document. Do you want to resubmit?");
+    if(r==true){
+      $.post("php/controller.php",{method:'resubmitRating',text:text,doc_id:doc_id,rating:rating},function(retData){
+        if(retData.status_code==200)
+          alert("Success");
+        else alert("Some error occured");
+
+      },"json");
+
+
+    }
+  }
+     // displayDocContent();
+}
+,"json");
+
 });
 
 </script>

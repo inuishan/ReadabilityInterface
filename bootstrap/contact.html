@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Readability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="mycss/main.css">
+    <script src="js/jquery.js"></script>
+    <script src="annotator/annotator-full.min.js"></script>
+    <link rel="stylesheet" href="annotator/annotator.min.css">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">IRLAB DAIICT</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="about.html">About</a></li>
+              <li class="active"><a href="contact.html">Contact</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+          <div id="user_name_container">
+          <span id="user_name">Welcome Guest</span>
+          </div>
+          <div class="btn-group" id="login" href="login.html">
+          <a href="login.html"><button type="button" class="btn btn-inverse" href="login.html">Login</button></a>
+        </div>
+        <div class="btn-group" id="logout" href="login.html">
+          <button type="button" class="btn btn-inverse" href="login.html">Logout</button>
+        </div>
+        </div>
+        
+      </div>
+
+    </div>
+    <div id="main_content">
+
+
+Prasenjit Majumder<br>
+Principal Investigator,<br>
+p_majumder@daiict.ac.in<br>
+(+91) 79-30510605 <br><br><br>
+
+
+Ishan Jain,<br>
+ishanjain1991@gmail.com,<br>
+7878779803<br>
+
+<br><br><br>
+IR LAB: LAB 208-2, Lab Building, DAIICT, Gandhinagar.<br>
+Email: irlab.daiict@gmail.com<br>
+Call: (+91) 79-30510528<br>
+</div>
+    
+<script type="text/javascript">
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getDoc(doc_id){
+  $.get("php/controller.php",{method:'retrieveText','doc_id':doc_id},function(retData){
+  if(retData.status_code==200)
+    {
+     $("#doc_text").html(retData.text);
+    }
+},"json");
+}
+
+
+function getTotalDocs(){
+  $.get("php/controller.php",{method:'totalDocs'},function(retData){
+  if(retData.status_code==200)
+    {
+     no_docs = retData.total_docs;
+     for(var i=1;i<=no_docs;i++){
+      $("#doc_ids").append('<option id="document'+i+'"'+'>'+i+'</option>');
+     }
+     displayDocContent();
+
+    }
+},"json");  
+}
+function displayDocContent(){
+  var curr_doc = $("#doc_ids").val();
+  getDoc(curr_doc);
+}
+
+$("#doc_ids").change(function(e){
+  displayDocContent();
+});
+$("#submit_rating").click(function(e){
+
+});
+getTotalDocs();
+$.get("php/controller.php",{method:'isLoggedIn'},function(retData){
+  if(retData.status_code==200)
+    {
+      // alert(retData.value);
+      if(retData.value=="yes"){
+        // alert("hiiiii");
+        $("#user_name").html("Welcome user");
+        $("#login").css("display","none");
+        $("#logout").css("display","inline");
+
+      }
+      else{
+
+      }
+    }
+     // displayDocContent();
+
+    }
+,"json");
+
+
+
+$("#logout").click(function(){
+  $.get("php/controller.php",{method:'logout'},function(retData){
+  if(retData.status_code==200)
+    {
+        $("#user_name").html("Welcome guest");
+        $("#login").css("display","inline");
+        $("#logout").css("display","none");
+        window.location.reload(true);
+
+    }
+}
+,"json");
+
+});
+
+
+$('div').mouseup(function() {
+    // getSelectedText();
+});
+
+
+var allIndices = new Array();
+var count = 0;
+
+function getSelectedText() {
+    // if (window.getSelection) {
+    //     return window.getSelection().toString();
+    // } else if (document.selection) {
+    //     return document.selection.createRange().text;
+    // }
+    // return "";
+    var wordIndex;
+    if (window.getSelection) {
+  // alert("Cipuuuuuuul"); 
+    var sel = window.getSelection();
+    // log("Hi"+sel);
+
+    var n = String(sel).split(" ");
+    var length_sel = n.length;
+    log("Selected length "+length_sel);
+    var div = document.getElementById("doc_text");
+
+    if (sel.rangeCount) {
+        // Get the selected range
+        var range = sel.getRangeAt(0);
+        // log("dkfjdek");
+        // Check that the selection is wholly contained within the div text
+        // if (range.commonAncestorContainer == div.firstChild) 
+        
+            // Create a range that spans the content from the start of the div
+            // to the start of the selection
+            // log("dkfjdeksfdsf");
+            var precedingRange = document.createRange();
+            precedingRange.setStartBefore(div.firstChild);
+            precedingRange.setEnd(range.startContainer, range.startOffset);
+
+            // Get the text preceding the selection and do a crude estimate
+            // of the number of words by splitting on white space
+            var textPrecedingSelection = precedingRange.toString();
+            wordIndex = textPrecedingSelection.split(/\s+/).length;
+            for(var ii=0;ii<count;ii++){
+              if(wordIndex>allIndices[ii])
+                wordIndex++;
+            }
+            allIndices[count++]=wordIndex;
+
+            log("Word index: " + wordIndex);
+        
+        if(wordIndex>0){
+          var full_text = $("#doc_text").html();
+          var full_text_array = String(full_text).split(" ");
+          // log(full_text_array[0]);
+          // alert(full_text);
+          length = full_text_array.length;
+          var new_text = "";
+          // log(wordIndex);
+
+
+          //new code
+          var crawler = 1;
+          for(;crawler<wordIndex;crawler++)
+            new_text = new_text + full_text_array[crawler-1] + " ";
+          new_text = new_text + "<span class=\"highlighted_text\">";
+          new_text = new_text + full_text_array[crawler-1];
+          crawler++;
+          for(;crawler<wordIndex+length_sel;crawler++)
+            new_text = new_text + " "+full_text_array[crawler-1];
+          new_text = new_text + "</span>";
+          // crawler++;
+          for(;crawler<=length;crawler++)
+            new_text= new_text+" "+full_text_array[crawler-1];
+
+
+
+        //   for(var z=1;z<=length;z++){
+        //     if(z==wordIndex+length_sel){
+        //        new_text=" "+new_text+full_text_array[z-1]+"</span>";
+        //        continue;
+        //     }
+        //     if(z!=wordIndex)
+        //     {
+        //       // log(full_text_array[z-1]);
+        //       // new_text.concat(toString(full_text_array[z-1]));
+        //       new_text = " "+new_text + full_text_array[z-1];
+
+
+        //     }
+        //     if(z==wordIndex){
+        //       // log("dsjfkadsjfd");  
+        //       new_text+=" ";  
+        //       new_text= new_text + "<span class=\"highlighted_text\">";
+        //       new_text=new_text + full_text_array[z-1];
+        //       // z = z+length_sel;
+             
+
+        //     }
+        // }
+        //   // new_text+="\0"; 
+          // alert(new_text);
+          $("#doc_text").html(new_text) ;
+
+
+        }
+    }
+}
+}
+
+function log(msg){
+  if (window.console && console.log) {
+    // console.log(msg); //for firebug
+  }
+  // document.write(msg); //write to screen
+  $("#logBox").append(msg); //log to container
+  $("#logBox").append("<br>"); //log to container
+}
+// annotator
+
+// jQuery(function ($) {
+//     var content = $('body').annotator();
+//     // content.annotator('addPlugin', 'Store');
+//     setTimeout(xx(content),10000);
+    
+
+//     // content.dumpAnnotations();
+// });
+// function xx(content){alert(JSON.stringify(content.annotationData));}
+$(document).keydown(function(evt){
+    // log(evt.keyCode);
+    if (evt.keyCode==72 && (evt.ctrlKey)){
+        evt.preventDefault();
+        // alert('worked');
+        getSelectedText();
+
+    }
+});
+
+
+
+//TOOLTIP
+$("#highlight_button").attr('title', 'shortcut key is Ctrl+H');
+$("#highlight_button").click(function(){
+getSelectedText();
+});
+
+$("#submit_rating").click(function(){
+  var text = $("#doc_text").html();
+  var rating = 1;
+  $(".radio").each(function(index){
+    // log($(this).attr('checked'));
+      if(this.checked==true){
+        rating = index+1;
+      }
+ });
+
+  var doc_id = $("#doc_ids").val();
+
+  
+  $.post("php/controller.php",{method:'submitRating',text:text,doc_id:doc_id,rating:rating},function(retData){
+  if(retData.status_code==200)
+    {
+      alert("success");
+    }
+  else if(retData.status_code==400){
+    alert("Either you are not logged in or some error occured");
+  }
+  else if(retData.status_code==300){
+    alert("You have already submitted the rating for the doc");
+  }
+     // displayDocContent();
+}
+,"json");
+
+});
+
+</script>
+
+</body>
+</html>
